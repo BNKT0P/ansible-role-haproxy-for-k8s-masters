@@ -14,7 +14,7 @@ Requirements
 ------------
 
 - Kubespray
-- Ubuntu 16.04+
+- CentOS 7
 
 Role Variables
 --------------
@@ -74,3 +74,4 @@ Author Information
 ------------------
 
 This role was created in 2019 by lapee79 to setup HAProxy for Kubernetes masters.
+Modified in 2020 by BNKT0P (added CentOS support)
