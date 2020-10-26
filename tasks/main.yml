@@ -1,26 +1,53 @@
 ---
 - name: Install haproxy package
-  become: true
   package:
-    name: haproxy
-    state: present
+    name:
+      - haproxy
+    state: latest
+    update_cache: yes
 
 - name: Configure haproxy
   template:
     src: haproxy.cfg.j2
     dest: "{{ haproxy_config_file_path }}"
-  notify:
-    - restart haproxy
+  register: ha_config
+
+- name: Start and enable haproxy service
+  service:
+    name: haproxy
+    enabled: yes
+    state: started
+    daemon_reload: yes
+  register: haproxy_start
+
+- name: Restat haproxy service after config change
+  service:
+    name: haproxy
+    state: restarted
+  when: ha_config is changed
 
 - name: Install keepalived latest packages
-  become: true
-  snap:
-    name: keepalived
-    classic: yes
+  package:
+    name:
+      - keepalived
+    state: latest
+    update_cache: yes
 
 - name: Configure keepalived
   template:
     src: keepalived.conf.j2
     dest: "{{ keepalived_config_file_path }}"
-  notify:
-    - restart keepalived
+  register: ka_config
+
+- name: Start and enable keepalived service
+  service:
+    name: keepalived
+    enabled: yes
+    state: started
+    daemon_reload: yes
+
+- name: Restart keepalived in case of config change
+  service:
+    name: keepalived
+    state: restarted
+  when: ka_config is changed
